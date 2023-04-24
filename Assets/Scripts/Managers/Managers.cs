@@ -5,7 +5,9 @@ using UnityEngine;
 public class Managers : MonoBehaviour
 {
     private static Managers s_instance;
+
     private InputManager input = new InputManager();
+    private ResourceManager resource = new ResourceManager();
 
     public static Managers Instance
     {
@@ -16,6 +18,7 @@ public class Managers : MonoBehaviour
         }
     }
     public static InputManager Input => Instance.input;
+    public static ResourceManager Resource => Instance.resource;
 
     private void Start()
     {
