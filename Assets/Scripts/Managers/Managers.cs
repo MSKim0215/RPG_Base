@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Managers : MonoBehaviour
 {
-    private static Managers s_instance;  
+    private static Managers s_instance;
+    private InputManager input = new InputManager();
 
     public static Managers Instance
     {
@@ -14,6 +15,7 @@ public class Managers : MonoBehaviour
             return s_instance;   
         }
     }
+    public static InputManager Input => Instance.input;
 
     private void Start()
     {
@@ -34,5 +36,10 @@ public class Managers : MonoBehaviour
             DontDestroyOnLoad(target);
             s_instance = target.GetComponent<Managers>();
         }
+    }
+
+    private void Update()
+    {
+        input.OnUpdate();
     }
 }
