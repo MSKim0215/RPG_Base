@@ -20,7 +20,11 @@ public class ResourceManager
             Debug.LogWarning($"프리팹을 찾을 수 없습니다. {_path}");
             return null;
         }
-        return Object.Instantiate(prefab, _parent);
+
+        GameObject result = Object.Instantiate(prefab, _parent);
+        int index = result.name.IndexOf("(Clone)");
+        if(index > 0) result.name = result.name.Substring(0, index);
+        return result;
     }
 
     public void Destroy(GameObject _target)

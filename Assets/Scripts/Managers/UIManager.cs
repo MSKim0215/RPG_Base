@@ -58,6 +58,28 @@ public class UIManager
     }
     #endregion
 
+    #region SubItem 관리
+
+    /// <summary>
+    /// 서브아이템 생성 함수
+    /// </summary>
+    /// <typeparam name="T">스크립트 이름</typeparam>
+    /// <param name="_parent">생성될 위치 (부모)</param>
+    /// <param name="_name">프리팹 이름</param>
+    /// <returns></returns>
+    public T MakeSubItem<T>(Transform _parent = null, string _name = null) where T: UI_Base
+    {
+        if (string.IsNullOrEmpty(_name)) _name = typeof(T).Name;
+
+        GameObject prefab = Managers.Resource.Instantiate($"UI/SubItem/{_name}");
+        if(_parent != null)
+        {
+            prefab.transform.SetParent(_parent);
+        }
+        return prefab.GetOrAddComponent<T>();
+    }
+    #endregion
+
     #region Popup 관리
     /// <summary>
     /// 팝업 UI를 호출하는 함수

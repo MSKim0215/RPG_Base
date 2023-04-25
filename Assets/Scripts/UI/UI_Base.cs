@@ -5,9 +5,11 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class UI_Base : MonoBehaviour
+public abstract class UI_Base : MonoBehaviour
 {
     protected Dictionary<Type, UnityEngine.Object[]> objDict = new Dictionary<Type, UnityEngine.Object[]>();
+
+    public abstract void Init();
 
     /// <summary>
     /// UI 오브젝트를 찾아서 배열에 저장하는 함수
@@ -57,7 +59,7 @@ public class UI_Base : MonoBehaviour
     /// <param name="_target">목표 오브젝트</param>
     /// <param name="_action">이벤트</param>
     /// <param name="_type">이벤트 타입</param>
-    public static void AddUIEvent(GameObject _target, Action<PointerEventData> _action, Define.UIEvent _type = Define.UIEvent.Click)
+    public static void BindEvent(GameObject _target, Action<PointerEventData> _action, Define.UIEvent _type = Define.UIEvent.Click)
     {
         UI_EventHandler evt = Util.GetOrAddComponent<UI_EventHandler>(_target);
 
@@ -72,6 +74,7 @@ public class UI_Base : MonoBehaviour
         }
     }
 
+    protected GameObject GetObject(int _index) => Get<GameObject>(_index);
     protected Text GetText(int _index) => Get<Text>(_index);
     protected Image GetImage(int _index) => Get<Image>(_index);
     protected Button GetButton(int _index) => Get<Button>(_index);
