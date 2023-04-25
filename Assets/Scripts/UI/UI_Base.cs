@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class UI_Base : MonoBehaviour
 {
@@ -48,6 +49,27 @@ public class UI_Base : MonoBehaviour
         UnityEngine.Object[] objects = null;
         if (!objDict.TryGetValue(typeof(T), out objects)) return null;
         return objects[_index] as T;
+    }
+
+    /// <summary>
+    /// 이벤트 타입에 따라 UI 오브젝트에 이벤트를 부여
+    /// </summary>
+    /// <param name="_target">목표 오브젝트</param>
+    /// <param name="_action">이벤트</param>
+    /// <param name="_type">이벤트 타입</param>
+    public static void AddUIEvent(GameObject _target, Action<PointerEventData> _action, Define.UIEvent _type = Define.UIEvent.Click)
+    {
+        UI_EventHandler evt = Util.GetOrAddComponent<UI_EventHandler>(_target);
+
+        switch (_type)
+        {
+            case Define.UIEvent.Click:
+                {
+                    evt.OnClickHandler -= _action;
+                    evt.OnClickHandler += _action;
+                }
+                break;
+        }
     }
 
     protected Text GetText(int _index) => Get<Text>(_index);

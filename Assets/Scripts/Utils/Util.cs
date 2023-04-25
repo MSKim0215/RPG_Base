@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class Util : MonoBehaviour
 {
+    public static T GetOrAddComponent<T>(GameObject _target) where T : UnityEngine.Component
+    {
+        T component = _target.GetComponent<T>();
+        if (component == null)
+        {
+            component = _target.AddComponent<T>();
+        }
+        return component;
+    }
+
     /// <summary>
     /// 자식 오브젝트 (게임 오브젝트 타입용) 탐색 함수
     /// </summary>
