@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     private float speed = 10f;
     private Vector3 destPos;            // 목표지점
     private bool isMoveToDest = false;  // 목표지점 이동 활성화 체크
+    private float wait_run_ratio;
 
     private void Start()
     {
@@ -29,6 +30,19 @@ public class PlayerController : MonoBehaviour
                 transform.position += dir.normalized * moveDist;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
             }
+        }
+
+        if(isMoveToDest)
+        {
+            wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1, 10f * Time.deltaTime);
+            Animator anim = GetComponent<Animator>();
+            anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        }
+        else
+        {
+            wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0, 10f * Time.deltaTime);
+            Animator anim = GetComponent<Animator>();
+            anim.SetFloat("wait_run_ratio", wait_run_ratio);
         }
     }
 
