@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour
 
     private float speed = 10f;
     private Vector3 destPos;            // 목표지점
-    private float wait_run_ratio;
     private PlayerState state = PlayerState.Idle;
 
     private void Start()
@@ -41,9 +40,8 @@ public class PlayerController : MonoBehaviour
     private void UpdateIdle()
     {
         // TODO: 애니메이션
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0, 10f * Time.deltaTime);
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.SetFloat("speed", 0);
     }
 
     /// <summary>
@@ -60,9 +58,9 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
 
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1, 10f * Time.deltaTime);
+        // TODO: 애니메이션
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.SetFloat("speed", speed);
     }
 
     ///// <summary>
@@ -113,4 +111,11 @@ public class PlayerController : MonoBehaviour
             state = PlayerState.Moving;
         }
     }
+
+    #region Event Callback
+    private void OnRunEvent()
+    {
+        Debug.Log("터벅");
+    }
+    #endregion
 }
