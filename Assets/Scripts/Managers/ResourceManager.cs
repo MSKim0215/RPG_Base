@@ -4,7 +4,20 @@ using UnityEngine;
 
 public class ResourceManager
 {
-    public T Load<T>(string _path) where T : Object => Resources.Load<T>(_path);
+    public T Load<T>(string _path) where T : Object
+    {
+        if(typeof(T) == typeof(GameObject))
+        {   // TODO: 이미 원본 오브젝트를 들고 있다면 바로 사용
+            string name = _path;
+            int index = name.LastIndexOf('\\');
+            if(index >= 0) name = name.Substring(index + 1);
+
+            GameObject original = Managers.Pool.GetOriginal(name);
+            if (original != null) return original as T;
+        }
+
+        return Resources.Load<T>(_path);
+    }
 
     /// <summary>
     /// 프리팹 생성 함수
@@ -21,15 +34,26 @@ public class ResourceManager
             return null;
         }
 
+        if(prefab.GetComponent<Poolable>() != null)
+        {   // TODO: 풀링 안에 있는 오브젝트인지 체크
+            return Managers.Pool.Pop(prefab, _parent).gameObject;
+        }
+
         GameObject result = Object.Instantiate(prefab, _parent);
-        int index = result.name.IndexOf("(Clone)");
-        if(index > 0) result.name = result.name.Substring(0, index);
+        result.name = prefab.name;
         return result;
     }
 
     public void Destroy(GameObject _target)
     {
         if (_target == null) return;
+
+        Poolable able = _target.GetComponent<Poolable>();
+        if(able != null)
+        {   // TODO: 풀링에서 사용되는 오브젝트인지 체크
+            Managers.Pool.Push(able);
+            return;
+        }
         Object.Destroy(_target);
     }
 }

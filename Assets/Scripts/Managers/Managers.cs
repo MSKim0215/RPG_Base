@@ -11,6 +11,7 @@ public class Managers : MonoBehaviour
     private UIManager ui = new UIManager();
     private SceneManagerEx scene = new SceneManagerEx();
     private SoundManager sound = new SoundManager();
+    private PoolManager pool = new PoolManager();
 
     public static Managers Instance
     {
@@ -25,6 +26,7 @@ public class Managers : MonoBehaviour
     public static UIManager UI => Instance.ui;
     public static SceneManagerEx Scene => Instance.scene;
     public static SoundManager Sound => Instance.sound;
+    public static PoolManager Pool => Instance.pool;
 
     private void Start()
     {
@@ -45,6 +47,7 @@ public class Managers : MonoBehaviour
             DontDestroyOnLoad(target);
             s_instance = target.GetComponent<Managers>();
 
+            s_instance.pool.Init();
             s_instance.sound.Init();
         }
     }
@@ -55,6 +58,7 @@ public class Managers : MonoBehaviour
         Input.Clear();
         Scene.Clear();
         UI.Clear();
+        Pool.Clear();
     }
 
     private void Update()
