@@ -140,4 +140,10 @@ public class UIManager
         }
     }
     #endregion
+
+    public void Clear()
+    {
+        CloseAllPopupUI();
+        scene = null;
+    }
 }

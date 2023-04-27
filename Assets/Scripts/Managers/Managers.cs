@@ -10,6 +10,7 @@ public class Managers : MonoBehaviour
     private ResourceManager resource = new ResourceManager();
     private UIManager ui = new UIManager();
     private SceneManagerEx scene = new SceneManagerEx();
+    private SoundManager sound = new SoundManager();
 
     public static Managers Instance
     {
@@ -23,6 +24,7 @@ public class Managers : MonoBehaviour
     public static ResourceManager Resource => Instance.resource;
     public static UIManager UI => Instance.ui;
     public static SceneManagerEx Scene => Instance.scene;
+    public static SoundManager Sound => Instance.sound;
 
     private void Start()
     {
@@ -42,11 +44,21 @@ public class Managers : MonoBehaviour
 
             DontDestroyOnLoad(target);
             s_instance = target.GetComponent<Managers>();
+
+            s_instance.sound.Init();
         }
+    }
+
+    public static void Clear()
+    {
+        Sound.Clear();
+        Input.Clear();
+        Scene.Clear();
+        UI.Clear();
     }
 
     private void Update()
     {
-        input.OnUpdate();
+        Input.OnUpdate();
     }
 }

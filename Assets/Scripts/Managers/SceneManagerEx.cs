@@ -13,8 +13,13 @@ public class SceneManagerEx
     /// <param name="_type">╬ю е╦ют</param>
     public void LoadScene(Define.Scene _type)
     {
-        CurrentScene.Clear();
+        Managers.Clear();
         SceneManager.LoadScene(GetSceneName(_type));
+    }
+
+    public void Clear()
+    {
+        CurrentScene.Clear();
     }
 
     private string GetSceneName(Define.Scene _type) => System.Enum.GetName(typeof(Define.Scene), _type);
