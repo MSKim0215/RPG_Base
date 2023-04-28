@@ -10,11 +10,11 @@ public interface ILoader<Key, Value>
 public class DataManager
 {
     // Ω∫≈» µ•¿Ã≈Õ
-    public Dictionary<int, Stat> StatDict { private set; get; } = new Dictionary<int, Stat>();
+    public Dictionary<int, Data.Stat> StatDict { private set; get; } = new Dictionary<int, Data.Stat>();
 
     public void Init()
     {
-        StatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
+        StatDict = LoadJson<Data.StatData, int, Data.Stat>("StatData").MakeDict();
     }
 
     private Loader LoadJson<Loader, Key, Value>(string _path) where Loader: ILoader<Key,Value>

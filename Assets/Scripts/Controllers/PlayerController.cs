@@ -7,15 +7,17 @@ public class PlayerController : MonoBehaviour
 {
     public enum PlayerState
     {
-        Die, Idle, Moving
+        Die, Idle, Moving, Attack
     }
 
-    private float speed = 10f;
+    private PlayerStat stat;
     private Vector3 destPos;            // 목표지점
     private PlayerState state = PlayerState.Idle;
 
     private void Start()
     {
+        stat = GetComponent<PlayerStat>();
+
         Managers.Input.MouseAction -= OnMouseClicked;
         Managers.Input.MouseAction += OnMouseClicked;
     }
@@ -52,7 +54,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
-            float moveDist = Mathf.Clamp(speed * Time.deltaTime, 0, dir.magnitude);
+            float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
             nav.Move(dir.normalized * moveDist);
 
             Debug.DrawRay(transform.position + Vector3.up * 0.5f, dir.normalized, Color.red);
@@ -67,9 +69,10 @@ public class PlayerController : MonoBehaviour
 
         // TODO: 애니메이션
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("speed", speed);
+        anim.SetFloat("speed", stat.MoveSpeed);
     }
 
+    int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
     /// <summary>
     /// 마우스 입력 움직임 제어 함수
     /// </summary>
@@ -79,15 +82,21 @@ public class PlayerController : MonoBehaviour
         if (state == PlayerState.Die) return;
         if (_evt != Define.MouseEvent.Click) return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //Debug.DrawRay(Camera.main.transform.position, ray.direction * 100f, Color.red, 1f);
-        
         RaycastHit hit;
-        LayerMask layer = LayerMask.GetMask("Wall") | LayerMask.GetMask("Ground");
-        if(Physics.Raycast(ray, out hit, 100f, layer))
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if(Physics.Raycast(ray, out hit, 100f, mask))
         {
             destPos = hit.point;
             state = PlayerState.Moving;
+
+            if(hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+            {   // TODO: 몬스터 클릭 이벤트
+                Debug.Log("몬스터 클릭");
+            }
+            else
+            {   // TODO: 지형 클릭 이벤트
+                Debug.Log("지형 클릭");
+            }
         }
     }
 
