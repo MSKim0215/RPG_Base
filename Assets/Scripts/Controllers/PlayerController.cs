@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,9 +16,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        //Managers.Input.KeyAction -= OnKeyboard;
-        //Managers.Input.KeyAction += OnKeyboard;
-
         Managers.Input.MouseAction -= OnMouseClicked;
         Managers.Input.MouseAction += OnMouseClicked;
     }
@@ -50,11 +48,20 @@ public class PlayerController : MonoBehaviour
     private void UpdateMoving()
     {
         Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
-        if (dir.magnitude < 0.0001f) state = PlayerState.Idle;
+        if (dir.magnitude < 0.1f) state = PlayerState.Idle;
         else
         {
+            NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
             float moveDist = Mathf.Clamp(speed * Time.deltaTime, 0, dir.magnitude);
-            transform.position += dir.normalized * moveDist;
+            nav.Move(dir.normalized * moveDist);
+
+            Debug.DrawRay(transform.position + Vector3.up * 0.5f, dir.normalized, Color.red);
+            if(Physics.Raycast(transform.position, dir, 1f, LayerMask.GetMask("Block")))
+            {
+                state = PlayerState.Idle;
+                return;
+            }
+
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
 
@@ -62,35 +69,6 @@ public class PlayerController : MonoBehaviour
         Animator anim = GetComponent<Animator>();
         anim.SetFloat("speed", speed);
     }
-
-    ///// <summary>
-    ///// 키 입력 움직임 제어 함수
-    ///// </summary>
-    //private void OnKeyboard()
-    //{
-    //    if (Input.GetKey(KeyCode.W))
-    //    {
-    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
-    //        transform.position += Vector3.forward * Time.deltaTime * speed;
-    //    }
-    //    if (Input.GetKey(KeyCode.S))
-    //    {
-    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
-    //        transform.position += Vector3.back * Time.deltaTime * speed;
-    //    }
-    //    if (Input.GetKey(KeyCode.D))
-    //    {
-    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
-    //        transform.position += Vector3.right * Time.deltaTime * speed;
-    //    }
-    //    if (Input.GetKey(KeyCode.A))
-    //    {
-    //        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
-    //        transform.position += Vector3.left * Time.deltaTime * speed;
-    //    }
-
-    //    isMoveToDest = false;
-    //}
 
     /// <summary>
     /// 마우스 입력 움직임 제어 함수
@@ -102,10 +80,11 @@ public class PlayerController : MonoBehaviour
         if (_evt != Define.MouseEvent.Click) return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(Camera.main.transform.position, ray.direction * 100f, Color.red, 1f);
+        //Debug.DrawRay(Camera.main.transform.position, ray.direction * 100f, Color.red, 1f);
         
         RaycastHit hit;
-        if(Physics.Raycast(ray, out hit, 100f, LayerMask.GetMask("Wall")))
+        LayerMask layer = LayerMask.GetMask("Wall") | LayerMask.GetMask("Ground");
+        if(Physics.Raycast(ray, out hit, 100f, layer))
         {
             destPos = hit.point;
             state = PlayerState.Moving;
