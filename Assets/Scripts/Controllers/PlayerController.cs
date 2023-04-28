@@ -10,12 +10,23 @@ public class PlayerController : MonoBehaviour
         Die, Idle, Moving, Attack
     }
 
+    private enum CursorType
+    {
+        None, Attack, Hand
+    }
+
+    private CursorType cursorType = CursorType.None;
+    private Texture2D attackIcon, handIcon;
+
     private PlayerStat stat;
     private Vector3 destPos;            // 목표지점
     private PlayerState state = PlayerState.Idle;
 
     private void Start()
     {
+        attackIcon = Managers.Resource.Load<Texture2D>("Textures/Cursor/Attack");
+        handIcon = Managers.Resource.Load<Texture2D>("Textures/Cursor/Hand");
+
         stat = GetComponent<PlayerStat>();
 
         Managers.Input.MouseAction -= OnMouseClicked;
@@ -24,11 +35,41 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        switch(state)
+        UpdateMouseCursor();
+
+        switch (state)
         {
             case PlayerState.Die: UpdateDie(); break;
             case PlayerState.Idle: UpdateIdle(); break;
             case PlayerState.Moving: UpdateMoving(); break;
+        }
+    }
+
+    /// <summary>
+    /// 마우스 커서 업데이트 함수
+    /// </summary>
+    private void UpdateMouseCursor()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, 100f, mask))
+        {
+            if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+            {   // TODO: 몬스터 타겟 커서
+                if (cursorType != CursorType.Attack)
+                {
+                    Cursor.SetCursor(attackIcon, new Vector2(attackIcon.width / 5f, 0), CursorMode.Auto);
+                    cursorType = CursorType.Attack;
+                }
+            }
+            else
+            {   // TODO: 기본 커서
+                if (cursorType != CursorType.Hand)
+                {
+                    Cursor.SetCursor(handIcon, new Vector2(handIcon.width / 3f, 0), CursorMode.Auto);
+                    cursorType = CursorType.Hand;
+                }
+            }
         }
     }
 
