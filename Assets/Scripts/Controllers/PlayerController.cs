@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
 
         stat = GetComponent<PlayerStat>();
 
-        Managers.Input.MouseAction -= OnMouseClicked;
-        Managers.Input.MouseAction += OnMouseClicked;
+        Managers.Input.MouseAction -= OnMouseEvent;
+        Managers.Input.MouseAction += OnMouseEvent;
     }
 
     private void Update()
@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void UpdateMouseCursor()
     {
+        if (Input.GetMouseButton(0)) return;
+
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, 100f, mask))
@@ -98,10 +100,12 @@ public class PlayerController : MonoBehaviour
             float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
             nav.Move(dir.normalized * moveDist);
 
-            Debug.DrawRay(transform.position + Vector3.up * 0.5f, dir.normalized, Color.red);
-            if(Physics.Raycast(transform.position, dir, 1f, LayerMask.GetMask("Block")))
+            if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1f, LayerMask.GetMask("Block")))
             {
-                state = PlayerState.Idle;
+                if(!Input.GetMouseButton(0))
+                {
+                    state = PlayerState.Idle;
+                }
                 return;
             }
 
@@ -113,31 +117,58 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("speed", stat.MoveSpeed);
     }
 
-    int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
+    private int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
+    private GameObject target;
+
     /// <summary>
     /// 마우스 입력 움직임 제어 함수
     /// </summary>
     /// <param name="_evt">마우스 이벤트 종류</param>
-    private void OnMouseClicked(Define.MouseEvent _evt)
+    private void OnMouseEvent(Define.MouseEvent _evt)
     {
         if (state == PlayerState.Die) return;
-        if (_evt != Define.MouseEvent.Click) return;
 
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if(Physics.Raycast(ray, out hit, 100f, mask))
-        {
-            destPos = hit.point;
-            state = PlayerState.Moving;
+        bool raycastHit = Physics.Raycast(ray, out hit, 100f, mask);
 
-            if(hit.collider.gameObject.layer == (int)Define.Layer.Monster)
-            {   // TODO: 몬스터 클릭 이벤트
-                Debug.Log("몬스터 클릭");
-            }
-            else
-            {   // TODO: 지형 클릭 이벤트
-                Debug.Log("지형 클릭");
-            }
+        switch(_evt)
+        {
+            case Define.MouseEvent.PointerDown:
+                {
+                    if(raycastHit)
+                    {
+                        destPos = hit.point;
+                        state = PlayerState.Moving;
+
+                        if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+                        {   // TODO: 몬스터 클릭 이벤트
+                            target = hit.collider.gameObject;
+                        }
+                        else
+                        {   // TODO: 지형 클릭 이벤트
+                            target = null;
+                        }
+                    }
+                }
+                break;
+
+            case Define.MouseEvent.Press:
+                {
+                    if(target != null)
+                    {   // TODO: 목표물이 있다면
+                        destPos = target.transform.position;
+                    }
+                    else if(raycastHit)
+                    {
+                        destPos = hit.point;
+                    }
+                }
+                break;
+
+            case Define.MouseEvent.PointerUp:
+
+                break;
         }
     }
 
