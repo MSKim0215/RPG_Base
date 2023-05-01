@@ -9,6 +9,8 @@ public class GameScene : BaseScene
         base.Init();
 
         SceneType = Define.Scene.Game;
+
+        gameObject.GetOrAddComponent<CursorController>();
     }
 
     public override void Clear()
