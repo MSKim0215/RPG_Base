@@ -80,6 +80,25 @@ public class UIManager
     }
     #endregion
 
+    #region WordSpace 관리
+    public T MakeWordSpaceUI<T>(Transform _parent = null, string _name = null) where T : UI_Base
+    {
+        if (string.IsNullOrEmpty(_name)) _name = typeof(T).Name;
+
+        GameObject prefab = Managers.Resource.Instantiate($"UI/WorldSpace/{_name}");
+        if (_parent != null)
+        {
+            prefab.transform.SetParent(_parent);
+        }
+
+        Canvas canvas = prefab.GetOrAddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = Camera.main;
+
+        return prefab.GetOrAddComponent<T>();
+    }
+    #endregion
+
     #region Popup 관리
     /// <summary>
     /// 팝업 UI를 호출하는 함수

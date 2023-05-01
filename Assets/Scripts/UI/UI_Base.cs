@@ -11,6 +11,11 @@ public abstract class UI_Base : MonoBehaviour
 
     public abstract void Init();
 
+    private void Start()
+    {
+        Init();
+    }
+
     /// <summary>
     /// UI 오브젝트를 찾아서 배열에 저장하는 함수
     /// </summary>

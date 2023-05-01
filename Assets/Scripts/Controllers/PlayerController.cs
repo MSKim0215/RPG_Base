@@ -42,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
         Managers.Input.MouseAction -= OnMouseEvent;
         Managers.Input.MouseAction += OnMouseEvent;
+
+        Managers.UI.MakeWordSpaceUI<UI_Hpbar>(transform);
     }
 
     private void Update()
@@ -193,6 +195,15 @@ public class PlayerController : MonoBehaviour
     private void OnAttackEvent()
     {
         Debug.Log("АјАн");
+
+        if(target != null)
+        {
+            Stat targetStat = target.GetComponent<Stat>();
+            PlayerStat myStat = GetComponent<PlayerStat>();
+            int damage = Mathf.Max(0, myStat.Attack - targetStat.Defense);
+            Debug.Log(damage);
+            targetStat.Hp -= damage;
+        }
 
         if (stopAttack) State = PlayerState.Idle;
         else State = PlayerState.Attack;
