@@ -38,4 +38,9 @@ public class Define
     {
         Press, PointerDown, PointerUp, Click
     }
+
+    public enum CharacterState
+    {
+        Die, Moving, Idle, Attack
+    }
 }

@@ -200,6 +200,7 @@ GameObject:
   - component: {fileID: 3381114089901305}
   - component: {fileID: 542325758953745172}
   - component: {fileID: 1015592519155016753}
+  - component: {fileID: 6434209991553946340}
   - component: {fileID: 3446973713990180106}
   m_Layer: 6
   m_Name: Banana Man
@@ -259,6 +260,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.5, y: 1.87, z: 0.5}
   m_Center: {x: 0, y: 0.92, z: 0}
+--- !u!114 &6434209991553946340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812851038061483587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a3d3cc583c49d4486157a7201dfc0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state: 2
 --- !u!114 &3446973713990180106
 MonoBehaviour:
   m_ObjectHideFlags: 0

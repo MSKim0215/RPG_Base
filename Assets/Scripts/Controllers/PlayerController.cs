@@ -3,74 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : CharacterController
 {
-    public enum PlayerState
-    {
-        Die, Idle, Moving, Attack
-    }
-
     private PlayerStat stat;
-    private Vector3 destPos;            // 목표지점
     private int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
-    private GameObject target;
+    private bool stopAttack = false;
 
-    [Header("플레이어 상태")]
-    [SerializeField] private PlayerState state = PlayerState.Idle;
-
-    public PlayerState State
-    {
-        get { return state; }
-        set
-        {
-            Animator anim = GetComponent<Animator>();
-
-            state = value;
-            switch(state)
-            {
-                case PlayerState.Die: break;
-                case PlayerState.Idle: anim.CrossFade("WAIT", 0.1f); break;
-                case PlayerState.Moving: anim.CrossFade("RUN", 0.1f); break;
-                case PlayerState.Attack: anim.CrossFade("ATTACK", 0.1f, -1, 0); break;
-            }
-        }
-    }
-
-    private void Start()
+    public override void Init()
     {
         stat = GetComponent<PlayerStat>();
 
         Managers.Input.MouseAction -= OnMouseEvent;
         Managers.Input.MouseAction += OnMouseEvent;
 
-        Managers.UI.MakeWordSpaceUI<UI_Hpbar>(transform);
-    }
-
-    private void Update()
-    {
-        switch (State)
+        if (GetComponentInChildren<UI_Hpbar>() == null)
         {
-            case PlayerState.Die: UpdateDie(); break;
-            case PlayerState.Idle: UpdateIdle(); break;
-            case PlayerState.Moving: UpdateMoving(); break;
-            case PlayerState.Attack: UpdateAttack(); break;
+            Managers.UI.MakeWordSpaceUI<UI_Hpbar>(transform);
         }
-    }
-
-    private void UpdateDie()
-    {
-
-    }
-
-    private void UpdateIdle()
-    {
-        // TODO: 애니메이션
     }
 
     /// <summary>
     /// 플레이어 상태가 Moving일 경우 실행되는 업데이트 함수
     /// </summary>
-    private void UpdateMoving()
+    protected override void UpdateMoving()
     {
         // TODO: 타겟이 있을 경우, 몬스터가 사정거리에 들어오는 로직 실행
         if(target != null)
@@ -78,38 +33,34 @@ public class PlayerController : MonoBehaviour
             float distance = (destPos - transform.position).magnitude;
             if(distance <= 1)
             {
-                State = PlayerState.Attack;
+                State = Define.CharacterState.Attack;
                 return;
             }
         }
 
         Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
-        if (dir.magnitude < 0.1f) State = PlayerState.Idle;
+        if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
         else
         {
-            NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
-            float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
-            nav.Move(dir.normalized * moveDist);
-
             if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1f, LayerMask.GetMask("Block")))
             {
                 if(!Input.GetMouseButton(0))
                 {
-                    State = PlayerState.Idle;
+                    State = Define.CharacterState.Idle;
                 }
                 return;
             }
 
+            float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+            transform.position += dir.normalized * moveDist;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
-
-        // TODO: 애니메이션
     }
 
     /// <summary>
     /// 플레이어 상태가 Attack일 경우 실행되는 업데이트 함수
     /// </summary>
-    private void UpdateAttack()
+    protected override void UpdateAttack()
     {
         if(target != null)
         {
@@ -119,8 +70,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool stopAttack = false;
-
     /// <summary>
     /// 마우스 입력 움직임 제어 함수
     /// </summary>
@@ -129,8 +78,8 @@ public class PlayerController : MonoBehaviour
     {
         switch(State)
         {
-            case PlayerState.Idle: case PlayerState.Moving: OnMouseEvent_IdleRun(_evt); break;
-            case PlayerState.Attack:
+            case Define.CharacterState.Idle: case Define.CharacterState.Moving: OnMouseEvent_IdleRun(_evt); break;
+            case Define.CharacterState.Attack:
                 {
                     if(_evt == Define.MouseEvent.PointerUp)
                     {   // TODO: 한번이라도 공격을 멈추면 중지
@@ -154,7 +103,7 @@ public class PlayerController : MonoBehaviour
                     if (raycastHit)
                     {
                         destPos = hit.point;
-                        State = PlayerState.Moving;
+                        State = Define.CharacterState.Moving;
                         stopAttack = false;
 
                         if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
@@ -201,12 +150,11 @@ public class PlayerController : MonoBehaviour
             Stat targetStat = target.GetComponent<Stat>();
             PlayerStat myStat = GetComponent<PlayerStat>();
             int damage = Mathf.Max(0, myStat.Attack - targetStat.Defense);
-            Debug.Log(damage);
             targetStat.Hp -= damage;
         }
 
-        if (stopAttack) State = PlayerState.Idle;
-        else State = PlayerState.Attack;
+        if (stopAttack) State = Define.CharacterState.Idle;
+        else State = Define.CharacterState.Attack;
     }
     #endregion
 }
