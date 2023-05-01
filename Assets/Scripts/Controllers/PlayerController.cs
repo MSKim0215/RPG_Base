@@ -109,7 +109,12 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void UpdateAttack()
     {
-        Debug.Log("attack");
+        if(target != null)
+        {
+            Vector3 dir = target.transform.position - transform.position;
+            Quaternion quat = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20f * Time.deltaTime);
+        }
     }
 
     private bool stopAttack = false;
