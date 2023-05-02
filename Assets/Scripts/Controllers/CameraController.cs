@@ -20,7 +20,7 @@ public class CameraController : MonoBehaviour
             if (!player.IsValid()) return;
 
             RaycastHit hit;
-            if(Physics.Raycast(player.transform.position, delta, out hit, delta.magnitude, LayerMask.GetMask("Wall")))
+            if(Physics.Raycast(player.transform.position, delta, out hit, delta.magnitude, 1 << (int)Define.Layer.Block))
             {   // TODO: 카메라와 플레이어 사이에 벽이 있다면 카메라 이동
                 float dist = (hit.point - player.transform.position).magnitude * 0.8f;
                 transform.position = player.transform.position + delta.normalized * dist;

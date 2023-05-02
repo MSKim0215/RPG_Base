@@ -149,8 +149,7 @@ public class PlayerController : CharacterController
         if(target != null)
         {
             Stat targetStat = target.GetComponent<Stat>();
-            int damage = Mathf.Max(0, stat.Attack - targetStat.Defense);
-            targetStat.Hp -= damage;
+            targetStat.OnAttacked(stat);
         }
 
         if (stopAttack) State = Define.CharacterState.Idle;

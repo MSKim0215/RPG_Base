@@ -6,7 +6,9 @@ public class GameManager
 {
     private GameObject player;
     private HashSet<GameObject> monsters = new HashSet<GameObject>();
-    
+
+    public GameObject GetPlayer() => player;
+
     /// <summary>
     /// 게임 오브젝트 스폰 함수
     /// </summary>

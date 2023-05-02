@@ -7,18 +7,59 @@ public class PlayerStat : Stat
     private int exp;
     private int gold;
 
-    public int Exp { get { return exp; } set { exp = value; } }
+    public int Exp 
+    { 
+        get { return exp; } 
+        set 
+        { 
+            exp = value;
+
+            // TODO: 레벨업 체크 로직
+            int level = Level;
+            while(true)
+            {
+                Data.Stat stat;
+                if (!Managers.Data.StatDict.TryGetValue(level + 1, out stat)) break;
+                if (exp < stat.totalExp) break;
+                level++;
+            }
+
+            if(level != Level)
+            {
+                Debug.Log("레벨업!!!!!!!!!!!!");
+                Level = level;
+                SetStat(Level);
+            }
+        } 
+    }
     public int Gold { get { return gold; } set { gold = value; } }
 
     private void Start()
     {
         level = 1;
-        hp = 100;
-        maxHp = hp;
-        attack = 10;
         defense = 5;
         moveSpeed = 5f;
-        exp = 0;
         gold = 0;
+        exp = 0;
+
+        SetStat(level);
+    }
+
+    public void SetStat(int _level)
+    {
+        Dictionary<int, Data.Stat> datas = Managers.Data.StatDict;
+        Data.Stat stat = datas[level];
+
+        hp = stat.maxHp;
+        maxHp = hp;
+        attack = stat.attack;
+    }
+
+    /// <summary>
+    /// 죽음 함수
+    /// </summary>
+    protected override void OnDead(Stat _attacker)
+    {
+        Debug.Log("Player Dead");
     }
 }

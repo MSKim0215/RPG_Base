@@ -22,7 +22,7 @@ public class MonsterController : CharacterController
 
     protected override void UpdateIdle()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject player = Managers.Game.GetPlayer();
         if (player == null) return;
 
         float distance = (player.transform.position - transform.position).magnitude;
@@ -89,13 +89,7 @@ public class MonsterController : CharacterController
         if (target != null)
         {
             Stat targetStat = target.GetComponent<Stat>();
-            int damage = Mathf.Max(0, stat.Attack - targetStat.Defense);
-            targetStat.Hp -= damage;
-
-            if(targetStat.Hp <= 0)
-            {
-                Managers.Game.Despawn(targetStat.gameObject);
-            }
+            targetStat.OnAttacked(stat);
 
             if (targetStat.Hp > 0)
             {
