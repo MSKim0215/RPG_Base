@@ -11,6 +11,7 @@ public class PlayerController : CharacterController
 
     public override void Init()
     {
+        WorldObjectType = Define.WorldObject.Player;
         stat = GetComponent<PlayerStat>();
 
         Managers.Input.MouseAction -= OnMouseEvent;
@@ -148,8 +149,7 @@ public class PlayerController : CharacterController
         if(target != null)
         {
             Stat targetStat = target.GetComponent<Stat>();
-            PlayerStat myStat = GetComponent<PlayerStat>();
-            int damage = Mathf.Max(0, myStat.Attack - targetStat.Defense);
+            int damage = Mathf.Max(0, stat.Attack - targetStat.Defense);
             targetStat.Hp -= damage;
         }
 

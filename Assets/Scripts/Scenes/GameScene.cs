@@ -11,6 +11,11 @@ public class GameScene : BaseScene
         SceneType = Define.Scene.Game;
 
         gameObject.GetOrAddComponent<CursorController>();
+
+        GameObject player = Managers.Game.Spawn(Define.WorldObject.Player, "Player");
+        Camera.main.gameObject.GetOrAddComponent<CameraController>().SetPlayer(player);
+
+        Managers.Game.Spawn(Define.WorldObject.Monster, "BananaMan");
     }
 
     public override void Clear()

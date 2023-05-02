@@ -6,6 +6,16 @@ public class Managers : MonoBehaviour
 {
     private static Managers s_instance;
 
+    public static Managers Instance
+    {
+        get
+        {
+            Init();
+            return s_instance;
+        }
+    }
+
+    #region Core
     private InputManager input = new InputManager();
     private ResourceManager resource = new ResourceManager();
     private UIManager ui = new UIManager();
@@ -14,14 +24,6 @@ public class Managers : MonoBehaviour
     private PoolManager pool = new PoolManager();
     private DataManager data = new DataManager();
 
-    public static Managers Instance
-    {
-        get
-        {
-            Init();
-            return s_instance;   
-        }
-    }
     public static InputManager Input => Instance.input;
     public static ResourceManager Resource => Instance.resource;
     public static UIManager UI => Instance.ui;
@@ -29,6 +31,13 @@ public class Managers : MonoBehaviour
     public static SoundManager Sound => Instance.sound;
     public static PoolManager Pool => Instance.pool;
     public static DataManager Data => Instance.data;
+    #endregion
+
+    #region Contents
+    private GameManager game = new GameManager();
+
+    public static GameManager Game => Instance.game;
+    #endregion
 
     private void Start()
     {

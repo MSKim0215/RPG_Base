@@ -5,12 +5,11 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     private Define.CameraMode mode = Define.CameraMode.QuarterView;
-    private GameObject player;
     private Vector3 delta;       // 카메라와 플레이어의 거리
+    private GameObject player;
 
     private void Start()
     {
-        player = GameObject.Find("Player");
         delta = new Vector3(0, 9, -7.5f);
     }
 
@@ -18,6 +17,8 @@ public class CameraController : MonoBehaviour
     {
         if (mode == Define.CameraMode.QuarterView)
         {
+            if (!player.IsValid()) return;
+
             RaycastHit hit;
             if(Physics.Raycast(player.transform.position, delta, out hit, delta.magnitude, LayerMask.GetMask("Wall")))
             {   // TODO: 카메라와 플레이어 사이에 벽이 있다면 카메라 이동
@@ -37,4 +38,6 @@ public class CameraController : MonoBehaviour
         mode = Define.CameraMode.QuarterView;
         delta = _delta;
     }
+
+    public void SetPlayer(GameObject _player) => player = _player;
 }

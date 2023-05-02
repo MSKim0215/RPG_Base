@@ -43,4 +43,14 @@ public class Define
     {
         Die, Moving, Idle, Attack
     }
+
+    public enum WorldObject
+    {
+        Unknown, Player, Monster
+    }
+
+    public enum MonsterType
+    {
+        BananaMan = 100
+    }
 }

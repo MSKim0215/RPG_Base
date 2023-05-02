@@ -29,6 +29,8 @@ public abstract class CharacterController : MonoBehaviour
         }
     }
 
+    public Define.WorldObject WorldObjectType { get; protected set; } = Define.WorldObject.Unknown;
+
     private void Start()
     {
         Init();
