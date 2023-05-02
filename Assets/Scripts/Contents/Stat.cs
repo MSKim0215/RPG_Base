@@ -20,6 +20,11 @@ public class Stat: MonoBehaviour
 
     private void Start()
     {
+        ClearStat();
+    }
+
+    public void ClearStat()
+    {
         level = 1;
         hp = 100;
         maxHp = hp;

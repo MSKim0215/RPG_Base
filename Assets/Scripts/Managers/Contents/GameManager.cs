@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ public class GameManager
 {
     private GameObject player;
     private HashSet<GameObject> monsters = new HashSet<GameObject>();
+
+    public Action<int> OnSpawnEvent;
 
     public GameObject GetPlayer() => player;
 
@@ -21,7 +24,12 @@ public class GameManager
         GameObject prefab = Managers.Resource.Instantiate(_path, _parent);
         switch(_type)
         {
-            case Define.WorldObject.Monster: monsters.Add(prefab); break;
+            case Define.WorldObject.Monster:
+                {
+                    monsters.Add(prefab);
+                    OnSpawnEvent?.Invoke(1);
+                }
+                break;
             case Define.WorldObject.Player: player = prefab; break;
         }
         return prefab;
@@ -53,6 +61,7 @@ public class GameManager
                     if(monsters.Contains(_target))
                     {
                         monsters.Remove(_target);
+                        OnSpawnEvent?.Invoke(-1);
                     }
                 }
                 break;

@@ -40,6 +40,7 @@ public class PlayerController : CharacterController
         }
 
         Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
+        dir.y = 0;
         if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
         else
         {

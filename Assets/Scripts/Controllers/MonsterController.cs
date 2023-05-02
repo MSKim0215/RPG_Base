@@ -52,6 +52,7 @@ public class MonsterController : CharacterController
 
         // TODO: 아직 공격범위에 들어가지 않아서 이동
         Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
+        dir.y = 0;
         if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
         else
         {
