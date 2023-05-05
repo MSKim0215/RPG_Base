@@ -6,12 +6,16 @@ public class Stat: MonoBehaviour
 {
     protected int hp;
     protected int maxHp;
+    protected int mp;
+    protected int maxMp;
     protected int attack;
     protected int defense;
     protected float moveSpeed;
 
-    public int Hp { get { return hp; } set { hp = value; } }
-    public int MaxHp { get { return maxHp; } set { maxHp = value; } }
+    public virtual int Hp { get { return hp; } set { hp = value; } }
+    public virtual int MaxHp { get { return maxHp; } set { maxHp = value; } }
+    public virtual int Mp { get { return mp; } set { mp = value; } }
+    public virtual int MaxMp { get { return maxMp; } set { maxMp = value; } }
     public int Attack { get { return attack; } set { attack = value; } }
     public int Defense { get { return defense; } set { defense = value; } }
     public float MoveSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
@@ -25,6 +29,8 @@ public class Stat: MonoBehaviour
     {
         hp = 100;
         maxHp = hp;
+        mp = 10;
+        maxMp = mp;
         attack = 10;
         defense = 5;
         moveSpeed = 5f;
