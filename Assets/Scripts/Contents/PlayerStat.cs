@@ -4,8 +4,22 @@ using UnityEngine;
 
 public class PlayerStat : Stat
 {
+    private int level;
     private int exp;
     private int gold;
+
+    public int Level
+    {
+        get { return level; }
+        set
+        {
+            level = value;
+
+            // TODO: 레벨 관련 UI 초기화
+            UI_UnitFrame unitFrame = Managers.UI.GetScene<UI_UnitFrame>();
+            unitFrame.SetLevel(Level);
+        }
+    }
 
     public int Exp 
     { 
@@ -36,7 +50,7 @@ public class PlayerStat : Stat
 
     private void Start()
     {
-        level = 1;
+        Level = 1;
         defense = 5;
         moveSpeed = 5f;
         gold = 0;

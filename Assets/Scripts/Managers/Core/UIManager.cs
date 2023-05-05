@@ -5,8 +5,15 @@ using UnityEngine;
 public class UIManager
 {
     private Stack<UI_Popup> popupStack = new Stack<UI_Popup>();
-    private UI_Scene scene;
+    private Dictionary<string, UI_Scene> sceneDict = new Dictionary<string, UI_Scene>();
     private int order = 10;      // 현재 캔버스의 오더
+
+    public T GetScene<T>() where T : UI_Scene
+    {
+        if (sceneDict.Count <= 0) return null;
+        if (sceneDict.ContainsKey(typeof(T).Name)) return sceneDict[typeof(T).Name].GetComponent<T>();
+        return null;
+    }
 
     public GameObject Root
     {
@@ -51,10 +58,17 @@ public class UIManager
 
         GameObject prefab = Managers.Resource.Instantiate($"UI/Scene/{_name}");
         T sceneUI = Util.GetOrAddComponent<T>(prefab);
+        sceneDict.Add(_name, sceneUI);
 
         prefab.transform.SetParent(Root.transform);
 
         return sceneUI;
+    }
+
+    public void CloseAllSceneUI()
+    {
+        if (sceneDict.Count <= 0) return;
+        sceneDict.Clear();
     }
     #endregion
 
@@ -162,7 +176,7 @@ public class UIManager
 
     public void Clear()
     {
+        CloseAllSceneUI();
         CloseAllPopupUI();
-        scene = null;
     }
 }

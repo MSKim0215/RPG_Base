@@ -18,6 +18,9 @@ public class GameScene : BaseScene
         GameObject spawningPool = new GameObject { name = "SpawningPool" };
         SpawningPool pool = spawningPool.GetOrAddComponent<SpawningPool>();
         pool.SetKeepMonsterCount(5);
+
+        // 고정 UI 세팅
+        Managers.UI.ShowSceneUI<UI_UnitFrame>();
     }
 
     public override void Clear()
