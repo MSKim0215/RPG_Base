@@ -22,6 +22,7 @@ public class GameScene : BaseScene
         // 고정 UI 세팅
         Managers.UI.ShowSceneUI<UI_UnitFrame>();
         Managers.UI.ShowSceneUI<UI_ExpBar>();
+        Managers.UI.ShowSceneUI<UI_Joystick>();
     }
 
     public override void Clear()

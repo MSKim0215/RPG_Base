@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class PlayerController : CharacterController
 {
     private PlayerStat stat;
+    private FixedJoystick joystick;
     private int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
     private bool stopAttack = false;
 
@@ -13,13 +14,27 @@ public class PlayerController : CharacterController
     {
         WorldObjectType = Define.WorldObject.Player;
         stat = GetComponent<PlayerStat>();
+        joystick = Managers.UI.GetScene<UI_Joystick>().Joystick;
 
-        Managers.Input.MouseAction -= OnMouseEvent;
-        Managers.Input.MouseAction += OnMouseEvent;
+       // Managers.Input.MouseAction -= OnMouseEvent;
+       // Managers.Input.MouseAction += OnMouseEvent;
 
         if (GetComponentInChildren<UI_Hpbar>() == null)
         {
             Managers.UI.MakeWordSpaceUI<UI_Hpbar>(transform);
+        }
+    }
+
+    protected override void UpdateIdle()
+    {
+        if(joystick != null)
+        {
+            if(joystick.Horizontal != 0 && joystick.Vertical != 0)
+            {
+                Debug.Log("조이스틱 움직임");
+                State = Define.CharacterState.Moving;
+                return;
+            }
         }
     }
 
@@ -28,35 +43,52 @@ public class PlayerController : CharacterController
     /// </summary>
     protected override void UpdateMoving()
     {
-        // TODO: 타겟이 있을 경우, 몬스터가 사정거리에 들어오는 로직 실행
-        if(target != null)
+        if(joystick != null)
         {
-            float distance = (destPos - transform.position).magnitude;
-            if(distance <= 1)
+            if(joystick.Horizontal == 0 && joystick.Vertical == 0)
             {
-                State = Define.CharacterState.Attack;
+                Debug.Log("움직임 정지");
+                State = Define.CharacterState.Idle;
                 return;
             }
         }
 
-        Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
+        Vector3 dir = Vector3.forward * joystick.Vertical + Vector3.right * joystick.Horizontal;
         dir.y = 0;
-        if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
-        else
-        {
-            if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1f, LayerMask.GetMask("Block")))
-            {
-                if(!Input.GetMouseButton(0))
-                {
-                    State = Define.CharacterState.Idle;
-                }
-                return;
-            }
+        float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+        transform.position += dir.normalized * moveDist;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
 
-            float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
-            transform.position += dir.normalized * moveDist;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-        }
+
+        //// TODO: 타겟이 있을 경우, 몬스터가 사정거리에 들어오는 로직 실행
+        //if(target != null)
+        //{
+        //    float distance = (destPos - transform.position).magnitude;
+        //    if(distance <= 1)
+        //    {
+        //        State = Define.CharacterState.Attack;
+        //        return;
+        //    }
+        //}
+
+        //Vector3 dir = destPos - transform.position;     // 목표지점의 방향벡터
+        //dir.y = 0;
+        //if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
+        //else
+        //{
+        //    if(Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1f, LayerMask.GetMask("Block")))
+        //    {
+        //        if(!Input.GetMouseButton(0))
+        //        {
+        //            State = Define.CharacterState.Idle;
+        //        }
+        //        return;
+        //    }
+
+        //    float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+        //    transform.position += dir.normalized * moveDist;
+        //    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+        //}
     }
 
     /// <summary>
