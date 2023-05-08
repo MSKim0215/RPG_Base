@@ -53,6 +53,7 @@ public class PlayerController : CharacterController
                     NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
                     nav.ResetPath();
                     target = null;
+                    Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
                     return;
                 }
             }
@@ -85,6 +86,7 @@ public class PlayerController : CharacterController
         {
             NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
             nav.ResetPath();
+            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
 
             if (joystick != null)
             {
@@ -133,28 +135,25 @@ public class PlayerController : CharacterController
         //}
     }
 
-    private void AutoMove()
-    {
-        Vector3 dir = target.transform.position - transform.position;     // 목표지점의 방향벡터
-        dir.y = 0;
-
-        float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
-        transform.position += dir.normalized * moveDist;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-
-
-
-    }
-
     /// <summary>
     /// 플레이어 상태가 Attack일 경우 실행되는 업데이트 함수
     /// </summary>
     protected override void UpdateAttack()
     {
-        if(target == null)
+        if (joystick != null)
         {
-            Debug.Log("타겟이 사라짐");
+            if (joystick.Horizontal != 0 || joystick.Vertical != 0)
+            {
+                State = Define.CharacterState.Moving;
+                Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
+                return;
+            }
+        }
+
+        if (target == null)
+        {
             State = Define.CharacterState.Idle;
+            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
             return;
         }
 
@@ -164,16 +163,6 @@ public class PlayerController : CharacterController
             Quaternion quat = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20f * Time.deltaTime);
         }
-
-        //if (joystick != null)
-        //{
-        //    if (joystick.Horizontal != 0 || joystick.Vertical != 0)
-        //    {
-        //        Debug.Log("공격 정지");
-        //        State = Define.CharacterState.Moving;
-        //        return;
-        //    }
-        //}
     }
 
     /// <summary>
@@ -241,11 +230,15 @@ public class PlayerController : CharacterController
         }
     }
 
-    public GameObject ScanTarget()
+    public void ScanTarget()
     {
-        if (target != null && !target.activeSelf) target = null;
-
-        if(target == null)
+        if(target != null)
+        {
+            target = null;
+            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
+            return;
+        }
+        else
         {
             GameObject closestObject = null;
             float closestDistance = Mathf.Infinity;
@@ -263,7 +256,21 @@ public class PlayerController : CharacterController
             }
             target = closestObject;
         }
-        return target;
+
+        if (target != null)
+        {
+            State = Define.CharacterState.Moving;
+            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.yellow);
+        }
+    }
+
+    public void ResetTarget()
+    {
+        if(target != null)
+        {
+            target = null;
+            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
+        }
     }
 
     #region Event Callback

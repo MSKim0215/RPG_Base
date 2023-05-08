@@ -8,7 +8,8 @@ public class UI_AttackButton : UI_Scene
 {
     private enum Buttons
     {
-        Btn_Attack
+        Btn_Attack,
+        Btn_Auto
     }
 
     private PlayerController player;
@@ -29,7 +30,23 @@ public class UI_AttackButton : UI_Scene
 
     private void OnAttack(PointerEventData _data)
     {
-        player.State = Define.CharacterState.Moving;
-        player.ScanTarget();
+        if(player.State != Define.CharacterState.Attack)
+        {
+            player.ScanTarget();
+        }
+        else
+        {
+            player.ResetTarget();
+        }
+    }
+
+    public void SetAttackButtonColor(Color _color)
+    {
+        GetButton((int)Buttons.Btn_Attack).image.color = _color;
+    }
+
+    public void SetAutoButtonColor(Color _color)
+    {
+        GetButton((int)Buttons.Btn_Auto).image.color = _color;
     }
 }
