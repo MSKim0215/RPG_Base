@@ -9,6 +9,8 @@ public class PlayerController : CharacterController
     private FixedJoystick joystick;
     private int mask = (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);  // 레이어 마스크
     private bool stopAttack = false;
+    
+    public bool autoAttack = false;
 
     public override void Init()
     {
@@ -31,10 +33,14 @@ public class PlayerController : CharacterController
         {
             if(joystick.Horizontal != 0 && joystick.Vertical != 0)
             {
-                Debug.Log("조이스틱 움직임");
                 State = Define.CharacterState.Moving;
                 return;
             }
+        }
+
+        if(autoAttack)
+        {
+            ScanTarget();
         }
     }
 
@@ -92,11 +98,19 @@ public class PlayerController : CharacterController
             {
                 if (joystick.Horizontal == 0 && joystick.Vertical == 0)
                 {
-                    State = Define.CharacterState.Idle;
+                    if(autoAttack)
+                    {
+                        ScanTarget();
+                    }
+                    else
+                    {
+                        State = Define.CharacterState.Idle;
+                    }
                     return;
                 }
             }
 
+            Debug.Log(State);
             Vector3 dir = Vector3.forward * joystick.Vertical + Vector3.right * joystick.Horizontal;
             dir.y = 0;
             float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
@@ -153,7 +167,15 @@ public class PlayerController : CharacterController
         if (target == null)
         {
             State = Define.CharacterState.Idle;
-            Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
+
+            if(autoAttack)
+            {
+                ScanTarget();
+            }
+            else
+            {
+                Managers.UI.GetScene<UI_AttackButton>().SetAttackButtonColor(Color.white);
+            }
             return;
         }
 

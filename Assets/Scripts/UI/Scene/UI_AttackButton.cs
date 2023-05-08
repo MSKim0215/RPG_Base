@@ -26,10 +26,13 @@ public class UI_AttackButton : UI_Scene
         Bind<Button>(typeof(Buttons));
 
         BindEvent(GetButton((int)Buttons.Btn_Attack).gameObject, OnAttack);
+        BindEvent(GetButton((int)Buttons.Btn_Auto).gameObject, OnAuto);
     }
 
     private void OnAttack(PointerEventData _data)
     {
+        if (player.autoAttack) return;
+
         if(player.State != Define.CharacterState.Attack)
         {
             player.ScanTarget();
@@ -37,6 +40,24 @@ public class UI_AttackButton : UI_Scene
         else
         {
             player.ResetTarget();
+        }
+    }
+
+    private void OnAuto(PointerEventData _data)
+    {
+        if (player.autoAttack)
+        {
+            player.ResetTarget();
+            player.autoAttack = false;
+            SetAttackButtonColor(Color.white);
+            SetAutoButtonColor(Color.white);
+        }
+        else
+        {
+            player.ScanTarget();
+            player.autoAttack = true;
+            SetAttackButtonColor(Color.yellow);
+            SetAutoButtonColor(Color.yellow);
         }
     }
 
