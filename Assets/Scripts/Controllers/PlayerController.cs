@@ -43,22 +43,64 @@ public class PlayerController : CharacterController
     /// </summary>
     protected override void UpdateMoving()
     {
-        if(joystick != null)
+        // TODO: 타겟이 있을 경우, 몬스터가 사정거리에 들어오는 로직 실행
+        if (target != null)
         {
-            if(joystick.Horizontal == 0 && joystick.Vertical == 0)
+            if(joystick != null)
             {
-                Debug.Log("움직임 정지");
-                State = Define.CharacterState.Idle;
+                if(joystick.Horizontal != 0 || joystick.Vertical != 0)
+                {
+                    NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
+                    nav.ResetPath();
+                    target = null;
+                    return;
+                }
+            }
+
+            float distance = (target.transform.position - transform.position).magnitude;
+            if (distance <= 2f)
+            {
+                NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
+                nav.SetDestination(transform.position);
+                State = Define.CharacterState.Attack;
                 return;
             }
+            else
+            {   // TODO: 아직 공격범위에 들어가지 않아서 이동
+                Vector3 dir = target.transform.position - transform.position;
+                dir.y = 0;
+
+                if (dir.magnitude < 0.1f) State = Define.CharacterState.Idle;
+                else
+                {
+                    NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
+                    nav.SetDestination(target.transform.position);
+                    nav.speed = stat.MoveSpeed;
+
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+                }
+            }
         }
+        else
+        {
+            NavMeshAgent nav = gameObject.GetOrAddComponent<NavMeshAgent>();
+            nav.ResetPath();
 
-        Vector3 dir = Vector3.forward * joystick.Vertical + Vector3.right * joystick.Horizontal;
-        dir.y = 0;
-        float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
-        transform.position += dir.normalized * moveDist;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+            if (joystick != null)
+            {
+                if (joystick.Horizontal == 0 && joystick.Vertical == 0)
+                {
+                    State = Define.CharacterState.Idle;
+                    return;
+                }
+            }
 
+            Vector3 dir = Vector3.forward * joystick.Vertical + Vector3.right * joystick.Horizontal;
+            dir.y = 0;
+            float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+            transform.position += dir.normalized * moveDist;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+        }
 
         //// TODO: 타겟이 있을 경우, 몬스터가 사정거리에 들어오는 로직 실행
         //if(target != null)
@@ -91,17 +133,47 @@ public class PlayerController : CharacterController
         //}
     }
 
+    private void AutoMove()
+    {
+        Vector3 dir = target.transform.position - transform.position;     // 목표지점의 방향벡터
+        dir.y = 0;
+
+        float moveDist = Mathf.Clamp(stat.MoveSpeed * Time.deltaTime, 0, dir.magnitude);
+        transform.position += dir.normalized * moveDist;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+
+
+
+    }
+
     /// <summary>
     /// 플레이어 상태가 Attack일 경우 실행되는 업데이트 함수
     /// </summary>
     protected override void UpdateAttack()
     {
-        if(target != null)
+        if(target == null)
+        {
+            Debug.Log("타겟이 사라짐");
+            State = Define.CharacterState.Idle;
+            return;
+        }
+
+        if (target != null)
         {
             Vector3 dir = target.transform.position - transform.position;
             Quaternion quat = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Lerp(transform.rotation, quat, 20f * Time.deltaTime);
         }
+
+        //if (joystick != null)
+        //{
+        //    if (joystick.Horizontal != 0 || joystick.Vertical != 0)
+        //    {
+        //        Debug.Log("공격 정지");
+        //        State = Define.CharacterState.Moving;
+        //        return;
+        //    }
+        //}
     }
 
     /// <summary>
@@ -167,6 +239,31 @@ public class PlayerController : CharacterController
                 }
                 break;
         }
+    }
+
+    public GameObject ScanTarget()
+    {
+        if (target != null && !target.activeSelf) target = null;
+
+        if(target == null)
+        {
+            GameObject closestObject = null;
+            float closestDistance = Mathf.Infinity;
+
+            Collider[] finds = Physics.OverlapSphere(transform.position, 50f, 1 << (int)Define.Layer.Monster);
+            foreach(Collider find in finds)
+            {
+                GameObject obj = find.gameObject;
+                float distance = Vector3.Distance(transform.position, obj.transform.position);
+                if(distance < closestDistance)
+                {
+                    closestObject = obj;
+                    closestDistance = distance;
+                }
+            }
+            target = closestObject;
+        }
+        return target;
     }
 
     #region Event Callback

@@ -23,6 +23,7 @@ public class GameScene : BaseScene
         Managers.UI.ShowSceneUI<UI_UnitFrame>();
         Managers.UI.ShowSceneUI<UI_ExpBar>();
         Managers.UI.ShowSceneUI<UI_Joystick>();
+        Managers.UI.ShowSceneUI<UI_AttackButton>().SetPlayer(player);
     }
 
     public override void Clear()
