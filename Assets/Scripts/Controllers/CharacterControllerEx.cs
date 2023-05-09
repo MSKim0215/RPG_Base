@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 
-public abstract class CharacterController : MonoBehaviour
+public abstract class CharacterControllerEx : MonoBehaviour
 {
     protected Vector3 destPos;            // 목표지점
     protected GameObject target;
@@ -13,7 +12,7 @@ public abstract class CharacterController : MonoBehaviour
 
     public virtual Define.CharacterState State
     {
-        get { return state; }
+        get => state;
         set
         {
             Animator anim = GetComponent<Animator>();
@@ -36,7 +35,7 @@ public abstract class CharacterController : MonoBehaviour
         Init();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         switch (State)
         {

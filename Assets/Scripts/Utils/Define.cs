@@ -41,7 +41,7 @@ public class Define
 
     public enum CharacterState
     {
-        Die, Moving, Idle, Attack
+        Die, Moving, Idle, Attack, SkillAttack, SkillBuff
     }
 
     public enum WorldObject

@@ -42,7 +42,7 @@ public class GameManager
     /// <returns></returns>
     public Define.WorldObject GetWorldObjectType(GameObject _target)
     {
-        CharacterController character = _target.GetComponent<CharacterController>();
+        CharacterControllerEx character = _target.GetComponent<CharacterControllerEx>();
         if (character == null) return Define.WorldObject.Unknown;
         return character.WorldObjectType;
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class MonsterController : CharacterController
+public class MonsterController : CharacterControllerEx
 {
     private Stat stat;
     private float scanRange = 10f;      // 인식 범위
